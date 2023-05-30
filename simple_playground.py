@@ -3,8 +3,15 @@ import random as r
 from simple_geometry import *
 import matplotlib.pyplot as plt
 import RBFN as rbfn
-import GA
+import PSO
 import numpy as np
+import RBFN
+
+EPOCH = 50
+NUMBER = 30
+K = 15
+LR_ID = 0.3
+LR_G = 0.3
 
 class Car():
     def __init__(self) -> None:
@@ -305,7 +312,7 @@ class Playground():
             return self.state
 
 
-def run_example(knum):
+def run_example():
     # use example, select random actions until gameover
     p = Playground()
     # figure, ax = plt.subplots()
@@ -313,13 +320,12 @@ def run_example(knum):
     state = p.reset()
     
 
-    data = np.array(rbfn.getTrain4d())
-    data, y = data[:, :-1], data[:, -1]
-    print(data)
-    ga = GA.GeneticOpt(G_num=20, RBFN_K=knum, load = True)
-    # rbfnet = rbfn.RBFNet(k=knum)
-    # ga.fit(500)
-    # rbfnet.fit(data, y)
+    train_data = np.array(RBFN.getTrain4d())
+    X = train_data[:, :-1]
+    Y = train_data[:, -1]
+    print("data = {}".format(X))
+    pso = PSO.PSOpt(train_x=X,train_y= Y, LR_ID=LR_ID, LR_G = LR_G, Number = NUMBER, k = K)
+    pso.fit(EPOCH)
 
     carInfo = []
     while not p.done:
@@ -330,7 +336,7 @@ def run_example(knum):
         # select action randomly
         # you can predict your action according to the state here
         
-        action = ga.RBFN.predict(state)
+        action = pso.RBFN.predict(state)
         #print(action)
         # take action
         print(state[0], state[1], state[2], action)
@@ -342,41 +348,5 @@ def run_example(knum):
 
     return carInfo
     
-
-def run_example6d(knum):
-    # use example, select random actions until gameover
-    p = Playground()
-    # figure, ax = plt.subplots()
-    
-    state = p.reset()
-    
-
-    data = np.array(rbfn.getTrain6d())
-    data, y = data[:, :-1], data[:, -1]
-    print(data)
-    
-    rbfnet = rbfn.RBFNet(k=knum)
-    rbfnet.fit(data, y)
-    carInfo = []
-    while not p.done:
-        # print every state and position of the car
-        info = [p.car.getPosition('center').x, p.car.getPosition('center').y] + state
-        carInfo.append(info)
-        #print(state, p.car.getPosition('center'))
-        # select action randomly
-        # you can predict your action according to the state here
-        stateFor6d = [p.car.getPosition('center').x, p.car.getPosition('center').y] + state
-        #print(stateFor6d)
-
-        action = rbfnet.predict(stateFor6d)
-        print(stateFor6d[0], stateFor6d[1], stateFor6d[2], stateFor6d[3], stateFor6d[4], action)
-        #print(action)
-        # take action
-        state = p.step(action)
-    info = [p.car.getPosition('center').x, p.car.getPosition('center').y] + state
-    carInfo.append(info)
-
-    return carInfo
-
 if __name__ == "__main__":
-    run_example(10)
+    run_example()

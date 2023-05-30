@@ -52,7 +52,7 @@ def RBFNLearn():
     k = ui.knum.value()
     k=10
     if ui.radio4d.isChecked():
-        carInfo = sp.run_example(k)
+        carInfo = sp.run_example()
     else:
         carInfo = sp.run_example6d(k)
     

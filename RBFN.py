@@ -112,6 +112,7 @@ class RBFNet(object):
     def predict(self, X):
         # print("X.shape {}".format(len(X)))
         a = np.array([1] + [gaussian(X, c, s) for c, s, in zip(self.centers, self.stds)])
+        # print("a shape = {}".format(a.shape))
         # print("a.shape = {}",format(a.shape))
         # a = np.array([1] + [X])
         # print("self.w.shape {}".format(self.w.shape))
