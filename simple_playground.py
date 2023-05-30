@@ -324,8 +324,8 @@ def run_example():
     X = train_data[:, :-1]
     Y = train_data[:, -1]
     print("data = {}".format(X))
-    pso = PSO.PSOpt(train_x=X,train_y= Y, LR_ID=LR_ID, LR_G = LR_G, Number = NUMBER, k = K)
-    pso.fit(EPOCH)
+    pso = PSO.PSOpt(train_x=X,train_y= Y, LR_ID=LR_ID, LR_G = LR_G, Number = NUMBER, k = K, Load=True)
+    # pso.fit(EPOCH)
 
     carInfo = []
     while not p.done:

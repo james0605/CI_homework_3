@@ -11,7 +11,7 @@ import math
 # EPOCH = 10
 # -----PSO Algo-----
 class PSOpt(object):
-    def __init__(self, train_x, train_y,LR_ID = 0.3, LR_G = 0.3, Number = 10, k = 5):
+    def __init__(self, train_x, train_y,LR_ID = 0.3, LR_G = 0.3, Number = 10, k = 5, Load = False):
         # init data set
         self.train_x = train_x
         self.train_y = train_y
@@ -35,6 +35,12 @@ class PSOpt(object):
         self.P_id = {i:{"X":self.RBFNs_x[i], "fitness":self.cal_fitness(self.RBFNs_x[i])} for i in range(self.Number)}
         # print("P_g = {}".format(self.P_g))
         # print("P_id = {}".format(self.P_id))
+
+        # -----LOAD-----
+        if Load:
+            self.RBFN.centers = np.load('weight/RBFN_Center.npy')
+            self.RBFN.w = np.load('weight/RBFN_Weight.npy')
+            self.RBFN.stds = np.load('weight/RBFN_stds.npy')
 
     def cal_fitness(self, weight):
         fitness = 1/self.RMSE_loss(weight)
@@ -68,7 +74,7 @@ class PSOpt(object):
         for i in self.RBFNs_v.keys():
             self.RBFNs_v[i] = self.RBFNs_v[i] + self.LR_ID*(self.P_id[i]["X"] - self.RBFNs_x[i]) + self.LR_G*(self.P_g["X"] - self.RBFNs_x[i])
         return self.RBFNs_v
-    
+    # -----perdict-----
     def predict(self, states, weight):
         # init weight and test data
         self.RBFN.w = weight
@@ -85,7 +91,7 @@ class PSOpt(object):
         predict = self.predict(self.train_x, Genetic)
         loss = math.sqrt(np.sum((predict - self.train_y)**2)/len(self.train_x))
         return loss
-    
+    # -----train-----
     def fit(self, epoch):
         for i in range(epoch):
             print("epoch : {}".format(i))
@@ -98,6 +104,7 @@ class PSOpt(object):
         self.RBFN.w = self.P_g["X"]
         np.save("RBFN_Center", self.RBFN.centers)
         np.save("RBFN_Weight", self.RBFN.w)
+        np.save("RBFN_stds", self.RBFN.stds)
 
 # -----test-----
 if __name__ == "__main__":
