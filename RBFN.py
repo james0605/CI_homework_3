@@ -88,20 +88,14 @@ class RBFNet(object):
         self.w = np.random.randn(k + 1) * np.random.randn(k + 1) 
         # self.w *= np.random.randn(k + 1)
         self.traindata = np.array(getTrain4d())
-        self.X = self.traindata[:, :-1]
-        self.Y = self.traindata[:, -1]
-        self.centers, self.stds = kmeans(self.X, self.k)
-    # def fit(self, X, y):
-    #     self.centers, self.stds = kmeans(X, self.k)
+        # self.X = self.traindata[:, :-1]
+        # self.Y = self.traindata[:, -1]
+        # self.centers, self.stds = kmeans(self.X, self.k)
 
-    #     qp = []    
-    #     for i in range(X.shape[0]):
-    #         a = np.array([1] + [gaussian(X[i], c, s) for c, s, in zip(self.centers, self.stds)])
-    #         qp.append(a)
-    #     qp = np.array(qp)
-    #     y = np.array(y)
-    #     self.w = ((np.linalg.inv(qp.T.dot(qp))).dot(qp.T)).dot(y)
-            
+    def get_center(self, X):
+        self.centers, self.stds = kmeans(X, self.k)
+        return self.centers, self.stds
+
     def fit(self, X, y):
         qp = []
         for i in range(X.shape[0]):
@@ -116,16 +110,21 @@ class RBFNet(object):
         np.save('weight', self.w)
 
     def predict(self, X):
+        # print("X.shape {}".format(len(X)))
         a = np.array([1] + [gaussian(X, c, s) for c, s, in zip(self.centers, self.stds)])
+        # print("a.shape = {}",format(a.shape))
         # a = np.array([1] + [X])
+        # print("self.w.shape {}".format(self.w.shape))
         y_pred = a.dot(self.w)
         return np.array(y_pred)
     
 if __name__ == "__main__":
-    rbfn = RBFNet(k=15)
+    
     traindata = np.array(getTrain4d())
     X = traindata[:, :-1]
     Y = traindata[:, -1]
     print(Y)
+    rbfn = RBFNet(k=15)
+    rbfn.get_center(X=X)
     rbfn.fit(X,Y)
     print(rbfn.predict([9.7355, 10.9379, 18.5740]))
